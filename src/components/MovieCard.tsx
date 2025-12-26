@@ -1,17 +1,25 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { format } from 'date-fns';
 import { IMovie } from '../api/types';
 import { IMAGE_BASE_URL } from '@env';
+import { Icon } from './Icon';
 
 interface Props {
   movie: IMovie;
   onPress: (movie: IMovie) => void;
+  onRemove?: (movieId: number) => void;
 }
 
-export const MovieCard: React.FC<Props> = ({ movie, onPress }) => {
+export const MovieCard: React.FC<Props> = ({ movie, onPress, onRemove }) => {
   const imageUrl = movie.poster_path
     ? { uri: `${IMAGE_BASE_URL}${movie.poster_path}` }
-    : undefined; // Add a placeholder image if needed (P2)
+    : undefined;
+
+  // Format date: "19 July 2023"
+  const formattedDate = movie.release_date
+    ? format(new Date(movie.release_date), 'd MMMM yyyy')
+    : movie.release_date;
 
   return (
     <TouchableOpacity style={styles.container} onPress={() => onPress(movie)}>
@@ -20,11 +28,20 @@ export const MovieCard: React.FC<Props> = ({ movie, onPress }) => {
         <Text style={styles.title} numberOfLines={2}>
           {movie.title}
         </Text>
-        <Text style={styles.date}>{movie.release_date}</Text>
+        <Text style={styles.date}>{formattedDate}</Text>
         <Text style={styles.overview} numberOfLines={3}>
           {movie.overview}
         </Text>
       </View>
+      {onRemove && (
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={() => onRemove(movie.id)}
+          activeOpacity={0.7}
+        >
+          <Icon name="Close" size={16} color="#000" />
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 };
@@ -84,14 +101,18 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     overflow: 'hidden',
     height: 140,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    position: 'relative',
   },
   poster: {
     width: 100,
-    height: '100%',
+    height: 140,
   },
   info: {
     flex: 1,
     padding: 12,
+    paddingRight: 40,
   },
   title: {
     fontSize: 16,
@@ -106,7 +127,17 @@ const styles = StyleSheet.create({
   },
   overview: {
     fontSize: 13,
-    color: '#444',
+    color: '#999',
     lineHeight: 18,
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    padding: 4,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

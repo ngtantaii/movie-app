@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#fff',
   },
-  watchBtnActive: { backgroundColor: '#FF0000', borderColor: '#FF0000' },
+  watchBtnActive: { backgroundColor: '#89ed9fff', borderColor: '#89ed9fff' },
   watchBtnText: { color: 'white', fontWeight: 'bold', marginLeft: 8 },
 
   // White Section
@@ -385,7 +385,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    paddingBottom: 10,
+    // paddingBottom: 10,
+    marginBottom: 8,
   },
   castImg: {
     width: '100%',

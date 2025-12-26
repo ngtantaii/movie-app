@@ -3,17 +3,14 @@ import {
   View,
   Text,
   FlatList,
-  Image,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { format } from 'date-fns';
-import { Icon, AppLogo } from '../../components';
+import { Icon, AppLogo, MovieCard } from '../../components';
 import { useWatchlistLogic } from './useWatchlistLogic';
 import { IMovie } from '../../api/types';
-import { IMAGE_BASE_URL } from '@env';
 
 export const WatchlistScreen = () => {
   const {
@@ -56,67 +53,39 @@ export const WatchlistScreen = () => {
   }, [isFilterOpen, toggleFilterDropdown]);
 
   const renderMovieItem = ({ item }: { item: IMovie }) => {
-    const imageUrl = item.poster_path
-      ? `${IMAGE_BASE_URL}${item.poster_path}`
-      : null;
-
-    // Format date: "19 July 2023"
-    const formattedDate = item.release_date
-      ? format(new Date(item.release_date), 'd MMMM yyyy')
-      : item.release_date;
-
     return (
-      <TouchableOpacity
-        style={styles.movieCard}
-        onPress={() => handleMoviePress(item)}
-      >
-        <Image
-          source={{ uri: imageUrl || 'https://via.placeholder.com/100' }}
-          style={styles.poster}
-          resizeMode="cover"
-        />
-        <View style={styles.movieInfo}>
-          <Text style={styles.movieTitle} numberOfLines={2}>
-            {item.title}
-          </Text>
-          <Text style={styles.movieDate}>{formattedDate}</Text>
-          <Text style={styles.movieOverview} numberOfLines={3}>
-            {item.overview}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.removeButton}
-          onPress={() => handleRemove(item.id)}
-        >
-          <Icon name="Close" size={16} color="#000" />
-        </TouchableOpacity>
-      </TouchableOpacity>
+      <MovieCard
+        movie={item}
+        onPress={handleMoviePress}
+        onRemove={handleRemove}
+      />
     );
   };
-
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#032541" />
-      
+
       {/* Logo Header */}
       <View style={styles.logoHeader}>
         <AppLogo width={120} height={40} />
       </View>
 
       {/* User Profile Section */}
-      <View style={styles.profileSection}>
-        <TouchableOpacity style={styles.backButton} onPress={goBack}>
+      <View style={styles.profileContainer}>
+        <TouchableOpacity onPress={goBack}>
           <Icon name="ArrowLeft" size={20} color="white" />
         </TouchableOpacity>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {username.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>{username}</Text>
-          <Text style={styles.memberSince}>Member since {joinedDate}</Text>
+        <View style={styles.profileSection}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {username.charAt(0).toUpperCase()}
+            </Text>
+          </View>
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>{username}</Text>
+            <Text style={styles.memberSince}>Member since {joinedDate}</Text>
+          </View>
         </View>
       </View>
 
@@ -209,13 +178,13 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#032541',
-    padding: 16,
-    paddingLeft: 12,
+    marginTop: 4,
+    marginBottom: 12,
   },
-  backButton: {
-    padding: 8,
-    marginRight: 12,
+  profileContainer: {
+    backgroundColor: '#032541',
+    gap: 16,
+    padding: 16,
   },
   avatar: {
     width: 60,
@@ -343,53 +312,8 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   listContent: {
-    padding: 16,
+    // paddingHorizontal: 8,
     paddingTop: 8,
-  },
-  movieCard: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    marginBottom: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  poster: {
-    width: 100,
-    height: 140,
-  },
-  movieInfo: {
-    flex: 1,
-    padding: 12,
-    paddingRight: 40,
-  },
-  movieTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 6,
-  },
-  movieDate: {
-    fontSize: 13,
-    color: '#999',
-    marginBottom: 8,
-  },
-  movieOverview: {
-    fontSize: 13,
-    color: '#999',
-    lineHeight: 18,
-  },
-  removeButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    padding: 4,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   emptyContainer: {
     flex: 1,
@@ -402,5 +326,3 @@ const styles = StyleSheet.create({
     color: '#999',
   },
 });
-
-
