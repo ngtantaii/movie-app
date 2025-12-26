@@ -12,16 +12,16 @@ interface IconProps {
 }
 
 export const Icon: React.FC<IconProps> = ({ name, size = 24, color = 'black', style }) => {
-  // Lấy ra component icon tương ứng dựa vào name
+  // Get the corresponding icon component based on name
   const IconComponent = Icons[name];
 
-  // Kiểm tra xem có icon đó không để tránh crash app
+  // Check if icon exists to prevent app crash
   if (!IconComponent) {
     console.warn(`Icon "${name}" not found!`);
     return null;
   }
 
-  // Nếu có style, wrap trong View; nếu không, render trực tiếp
+  // If style is provided, wrap in View; otherwise render directly
   if (style) {
     return (
       <View style={style}>

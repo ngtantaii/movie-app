@@ -10,122 +10,94 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useHomeLogic } from './useHomeLogic';
-import { MovieCard, Icon } from '../../components';
+import {
+  MovieCard,
+  Accordion,
+  IAccordionOption,
+  AppLogo,
+} from '../../components';
 import { EMovieCategory } from '../../api/types';
-import Logo from '../../assets/svgs/Logo.svg';
+import { capitalizeWords } from '../../utils';
 
-// Component Dropdown
-const CategorySelector = ({
-  selected,
-  onSelect,
-}: {
-  selected: string;
-  onSelect: (c: EMovieCategory) => void;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const categories = Object.values(EMovieCategory);
-
-  return (
-    <View style={{ zIndex: 100 }}>
-      <TouchableOpacity
-        style={styles.dropdownHeader}
-        onPress={() => setIsOpen(!isOpen)}
-      >
-        <Text style={styles.dropdownText}>
-          {selected.replace('_', ' ').toUpperCase()}
-        </Text>
-        <Icon name="ChevronDown" size={16} color="#000" />
-      </TouchableOpacity>
-
-      {isOpen && (
-        <View style={styles.dropdownList}>
-          {categories.map(cat => (
-            <TouchableOpacity
-              key={cat}
-              style={styles.dropdownItem}
-              onPress={() => {
-                onSelect(cat);
-                setIsOpen(false);
-              }}
-            >
-              <Text>{cat.replace('_', ' ').toUpperCase()}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-};
-
-// Sort By Dropdown Component
-const SortBySelector = ({
-  selected,
-  onSelect,
-}: {
-  selected: string;
-  onSelect: (sort: string) => void;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const sortOptions = ['Rating', 'Release Date', 'Title'];
-
-  return (
-    <View style={{ zIndex: 99 }}>
-      <TouchableOpacity
-        style={styles.dropdownHeader}
-        onPress={() => setIsOpen(!isOpen)}
-      >
-        <Text style={styles.dropdownText}>Sort by: {selected}</Text>
-        <Icon name="ChevronDown" size={16} color="#000" />
-      </TouchableOpacity>
-
-      {isOpen && (
-        <View style={styles.dropdownList}>
-          {sortOptions.map(option => (
-            <TouchableOpacity
-              key={option}
-              style={styles.dropdownItem}
-              onPress={() => {
-                onSelect(option);
-                setIsOpen(false);
-              }}
-            >
-              <Text>{option}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-};
+type ExpandedAccordion = 'category' | 'sortBy' | null;
 
 export const HomeScreen = () => {
   const {
     movies,
     loading,
     selectedCategory,
+    sortBy,
     searchQuery,
     setSearchQuery,
     handleCategoryChange,
+    handleSortByChange,
     handleSearch,
     handleLoadMore,
     navigateToDetail,
   } = useHomeLogic();
 
+  const [expandedAccordion, setExpandedAccordion] =
+    useState<ExpandedAccordion>(null);
+
+  const handleCategoryToggle = () => {
+    setExpandedAccordion(prev => (prev === 'category' ? null : 'category'));
+  };
+
+  const handleSortByToggle = () => {
+    setExpandedAccordion(prev => (prev === 'sortBy' ? null : 'sortBy'));
+  };
+
+  // Category options
+  const categoryOptions: IAccordionOption[] = Object.values(EMovieCategory).map(
+    cat => ({
+      label: cat.replace('_', ' '),
+      value: cat,
+    }),
+  );
+
+  // Sort by options
+  const sortByOptions: IAccordionOption[] = [
+    { label: 'By Alphabetical Order', value: 'alphabetical' },
+    { label: 'By Rating', value: 'rating' },
+    { label: 'By Release Date', value: 'release_date' },
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Logo width={120} height={40} />
+        <AppLogo width={120} height={40} />
       </View>
 
       <View style={styles.controls}>
-        {/* Dropdown Category */}
-        <CategorySelector
-          selected={selectedCategory}
+        {/* Category Accordion */}
+        <Accordion
+          title="Category"
+          options={categoryOptions}
+          selectedValue={selectedCategory}
           onSelect={handleCategoryChange}
+          isExpanded={expandedAccordion === 'category'}
+          onToggle={handleCategoryToggle}
+          // renderSelectedLabel={value =>
+          //   capitalizeWords(value.replace('_', ' '))
+          // }
+          isCapitalizeWords
+          titleStyle={styles.selectedValueStyle}
         />
 
-        {/* Sort By Dropdown */}
-        <SortBySelector selected="Rating" onSelect={() => {}} />
+        {/* Sort By Accordion */}
+        <Accordion
+          title="Sort by"
+          options={sortByOptions}
+          selectedValue={sortBy}
+          onSelect={handleSortByChange}
+          isExpanded={expandedAccordion === 'sortBy'}
+          onToggle={handleSortByToggle}
+          // renderSelectedLabel={value => {
+          //   const option = sortByOptions.find(opt => opt.value === value);
+          //   return option ? option.label : 'Sort by';
+          // }}
+          titleStyle={styles.selectedValueStyle}
+        />
 
         {/* Search Bar */}
         <View style={styles.searchContainer}>
@@ -169,47 +141,13 @@ export const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },
   header: { padding: 16, alignItems: 'center', backgroundColor: 'white' },
-  logoText: { fontSize: 20, fontWeight: 'bold', color: '#01B4E4' },
-  controls: { padding: 16, zIndex: 1 },
-
-  // Dropdown Styles
-  dropdownHeader: {
-    padding: 12,
-    backgroundColor: 'white',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  dropdownText: { fontWeight: '600', fontSize: 14 },
-  dropdownList: {
-    position: 'absolute',
-    top: 45,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    elevation: 5,
-    zIndex: 1000,
-  },
-  dropdownItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
+  controls: { padding: 16 },
 
   // Search Styles
   searchContainer: {
     flexDirection: 'column',
     gap: 10,
-    marginTop: 10,
+    // marginTop: 10,
   },
   searchInput: {
     backgroundColor: 'white',
@@ -231,23 +169,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // Search Styles - before
-  //   searchContainer: { flexDirection: 'row', gap: 10 },
-  //   searchInput: {
-  //     flex: 1,
-  //     backgroundColor: 'white',
-  //     padding: 10,
-  //     borderRadius: 4,
-  //     borderWidth: 1,
-  //     borderColor: '#ddd',
-  //   },
-  //   searchButton: {
-  //     backgroundColor: '#ddd',
-  //     padding: 10,
-  //     borderRadius: 4,
-  //     justifyContent: 'center',
-  //   },
-
   // Footer
   loadMoreBtn: {
     backgroundColor: '#01B4E4',
@@ -257,4 +178,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadMoreText: { color: 'white', fontWeight: 'bold' },
+  selectedValueStyle: { fontWeight: '600' },
 });

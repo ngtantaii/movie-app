@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,11 +9,11 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { Icon } from '../../components';
+import { format } from 'date-fns';
+import { Icon, AppLogo } from '../../components';
 import { useWatchlistLogic } from './useWatchlistLogic';
 import { IMovie } from '../../api/types';
 import { IMAGE_BASE_URL } from '@env';
-import Logo from '../../assets/svgs/Logo.svg';
 
 export const WatchlistScreen = () => {
   const {
@@ -32,10 +32,38 @@ export const WatchlistScreen = () => {
     goBack,
   } = useWatchlistLogic();
 
+  const dropdownRef = useRef<View>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handlePressOutside = (event: any) => {
+      if (
+        isFilterOpen &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        toggleFilterDropdown();
+      }
+    };
+
+    if (isFilterOpen) {
+      // Use setTimeout to avoid immediate closure
+      const timer = setTimeout(() => {
+        // This will be handled by TouchableOpacity onPress
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isFilterOpen, toggleFilterDropdown]);
+
   const renderMovieItem = ({ item }: { item: IMovie }) => {
     const imageUrl = item.poster_path
       ? `${IMAGE_BASE_URL}${item.poster_path}`
       : null;
+
+    // Format date: "19 July 2023"
+    const formattedDate = item.release_date
+      ? format(new Date(item.release_date), 'd MMMM yyyy')
+      : item.release_date;
 
     return (
       <TouchableOpacity
@@ -51,7 +79,7 @@ export const WatchlistScreen = () => {
           <Text style={styles.movieTitle} numberOfLines={2}>
             {item.title}
           </Text>
-          <Text style={styles.movieDate}>{item.release_date}</Text>
+          <Text style={styles.movieDate}>{formattedDate}</Text>
           <Text style={styles.movieOverview} numberOfLines={3}>
             {item.overview}
           </Text>
@@ -60,28 +88,27 @@ export const WatchlistScreen = () => {
           style={styles.removeButton}
           onPress={() => handleRemove(item.id)}
         >
-          <Icon name="Close" size={20} color="#000" />
+          <Icon name="Close" size={16} color="#000" />
         </TouchableOpacity>
       </TouchableOpacity>
     );
   };
 
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#032541" />
       
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={goBack}>
-          <Icon name="ArrowLeft" size={20} color="white" />
-        </TouchableOpacity>
-        <View style={styles.logoContainer}>
-          <Logo width={120} height={40} />
-        </View>
+      {/* Logo Header */}
+      <View style={styles.logoHeader}>
+        <AppLogo width={120} height={40} />
       </View>
 
       {/* User Profile Section */}
       <View style={styles.profileSection}>
+        <TouchableOpacity style={styles.backButton} onPress={goBack}>
+          <Icon name="ArrowLeft" size={20} color="white" />
+        </TouchableOpacity>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
             {username.charAt(0).toUpperCase()}
@@ -93,40 +120,64 @@ export const WatchlistScreen = () => {
         </View>
       </View>
 
-      {/* Filter Bar */}
-      <View style={styles.filterBar}>
-        <View style={styles.filterContainer}>
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={toggleFilterDropdown}
-          >
-            <Text style={styles.filterText}>Filter by: {selectedSort}</Text>
-            <Icon name="ChevronDown" size={16} color="#000" />
-          </TouchableOpacity>
+      {/* Watchlist Title and Filters */}
+      <View style={styles.filterSection}>
+        <Text style={styles.watchlistTitle}>My Watchlist</Text>
+        <View style={styles.filterBar}>
+          <View style={styles.filterContainer}>
+            <Text style={styles.filterLabel}>Filter by:</Text>
+            <View style={styles.dropdownContainer}>
+              <TouchableOpacity
+                style={styles.dropdownButton}
+                onPress={toggleFilterDropdown}
+              >
+                <Text style={styles.dropdownText}>{selectedSort}</Text>
+                <Icon name="ChevronDown" size={14} color="#000" />
+              </TouchableOpacity>
 
-          {isFilterOpen && (
-            <View style={styles.filterDropdown}>
-              {sortOptions.map(option => (
-                <TouchableOpacity
-                  key={option}
-                  style={styles.filterOption}
-                  onPress={() => handleFilterSelect(option)}
-                >
-                  <Text>{option}</Text>
-                </TouchableOpacity>
-              ))}
+              {isFilterOpen && (
+                <View ref={dropdownRef} style={styles.dropdown}>
+                  {sortOptions.map(option => {
+                    const isSelected = option === selectedSort;
+                    return (
+                      <TouchableOpacity
+                        key={option}
+                        style={[
+                          styles.dropdownOption,
+                          isSelected && styles.dropdownOptionSelected,
+                        ]}
+                        onPress={() => handleFilterSelect(option)}
+                      >
+                        <Text
+                          style={[
+                            styles.dropdownOptionText,
+                            isSelected && styles.dropdownOptionTextSelected,
+                          ]}
+                        >
+                          {option}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
             </View>
-          )}
-        </View>
+          </View>
 
-        <TouchableOpacity
-          style={styles.orderContainer}
-          onPress={toggleSortOrder}
-        >
-          <Text style={styles.orderText}>
-            Order: {sortOrder === 'asc' ? '↑' : '↓'}
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.orderContainer}>
+            <Text style={styles.orderLabel}>Order:</Text>
+            <TouchableOpacity
+              style={styles.orderButton}
+              onPress={toggleSortOrder}
+            >
+              <Icon
+                name={sortOrder === 'asc' ? 'ChevronUp' : 'ChevronDown'}
+                size={14}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
 
       {/* Movie List */}
@@ -148,36 +199,28 @@ export const WatchlistScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'white',
   },
-  header: {
-    flexDirection: 'row',
+  logoHeader: {
+    padding: 16,
     alignItems: 'center',
-    backgroundColor: '#032541',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    height: 60,
-  },
-  backButton: {
-    padding: 8,
-  },
-  logoContainer: {
-    flex: 1,
-    alignItems: 'center',
-    marginRight: 40, // Compensate for back button
+    backgroundColor: 'white',
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#032541',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingLeft: 12,
+  },
+  backButton: {
+    padding: 8,
+    marginRight: 12,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: '#9C27B0',
     justifyContent: 'center',
     alignItems: 'center',
@@ -185,7 +228,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: 'white',
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
   },
   profileInfo: {
@@ -194,79 +237,122 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: 'white',
     marginBottom: 4,
   },
   memberSince: {
     fontSize: 14,
-    color: '#666',
+    color: 'white',
+  },
+  filterSection: {
+    backgroundColor: 'white',
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  watchlistTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+    paddingHorizontal: 16,
+    marginBottom: 16,
   },
   filterBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingHorizontal: 16,
   },
   filterContainer: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterLabel: {
+    fontSize: 14,
+    color: '#999',
+    marginRight: 8,
+  },
+  dropdownContainer: {
+    flex: 1,
     position: 'relative',
   },
-  filterButton: {
+  dropdownButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 4,
+    backgroundColor: 'white',
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#E0E0E0',
+    minHeight: 44,
   },
-  filterText: {
+  dropdownText: {
     fontSize: 14,
-    fontWeight: '600',
+    color: '#000',
+    flex: 1,
   },
-  filterDropdown: {
+  dropdown: {
     position: 'absolute',
-    top: 50,
+    top: '100%',
     left: 0,
     right: 0,
     backgroundColor: 'white',
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
+    borderColor: '#E0E0E0',
+    marginTop: 4,
     zIndex: 1000,
     elevation: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-  },
-  filterOption: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  orderContainer: {
-    marginLeft: 16,
-  },
-  orderText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  movieCard: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 8,
-    elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    overflow: 'hidden',
+  },
+  dropdownOption: {
+    padding: 12,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F5',
+    minHeight: 44,
+  },
+  dropdownOptionSelected: {
+    backgroundColor: '#E3F2FD',
+  },
+  dropdownOptionText: {
+    fontSize: 14,
+    color: '#000',
+    fontWeight: '400',
+  },
+  dropdownOptionTextSelected: {
+    color: '#01B4E4',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
+  },
+  orderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 16,
+  },
+  orderLabel: {
+    fontSize: 14,
+    color: '#999',
+    marginRight: 8,
+  },
+  orderButton: {
+    padding: 4,
+  },
+  listContent: {
+    padding: 16,
+    paddingTop: 8,
+  },
+  movieCard: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    marginBottom: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
     overflow: 'hidden',
     position: 'relative',
   },
@@ -277,12 +363,13 @@ const styles = StyleSheet.create({
   movieInfo: {
     flex: 1,
     padding: 12,
+    paddingRight: 40,
   },
   movieTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   movieDate: {
     fontSize: 13,
@@ -291,7 +378,7 @@ const styles = StyleSheet.create({
   },
   movieOverview: {
     fontSize: 13,
-    color: '#444',
+    color: '#999',
     lineHeight: 18,
   },
   removeButton: {
@@ -299,10 +386,8 @@ const styles = StyleSheet.create({
     top: 8,
     right: 8,
     padding: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 15,
-    width: 30,
-    height: 30,
+    width: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },

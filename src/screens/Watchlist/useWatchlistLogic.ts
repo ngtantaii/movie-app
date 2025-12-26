@@ -1,8 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { removeFromWatchlist } from '../../store/slices/watchlistSlice';
+import { setUsername, setJoinedDate } from '../../store/slices/settingsSlice';
 import { IMovie } from '../../api/types';
+import { movieApi } from '../../api/movies';
+import { format } from 'date-fns';
 
 type SortOption = 'Alphabetical order' | 'Rating' | 'Release date';
 type SortOrder = 'asc' | 'desc';
@@ -18,10 +21,29 @@ export const useWatchlistLogic = () => {
     state => state.settings.joinedDate || 'August 2023',
   );
   
-  const [selectedSort, setSelectedSort] = useState<SortOption>('Alphabetical order');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [selectedSort, setSelectedSort] = useState<SortOption>('Rating');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const sortOptions: SortOption[] = ['Alphabetical order', 'Rating', 'Release date'];
+
+  // Fetch account details on mount
+  useEffect(() => {
+    const fetchAccountDetails = async () => {
+      try {
+        const account = await movieApi.getAccountDetails();
+        if (account.username) {
+          dispatch(setUsername(account.username));
+        }
+        // Note: TMDB API doesn't provide joined date, so we'll keep the default
+        // or you can use account.id to generate a date
+      } catch (error) {
+        console.error('Failed to fetch account details:', error);
+        // Keep default values on error
+      }
+    };
+
+    fetchAccountDetails();
+  }, [dispatch]);
 
   // Sort watchlist based on selected option and order
   const sortedWatchlist = useMemo(() => {

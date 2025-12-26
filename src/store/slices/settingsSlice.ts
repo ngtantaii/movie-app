@@ -3,12 +3,14 @@ import { EMovieCategory } from '../../api/types';
 
 interface SettingsState {
   selectedCategory: EMovieCategory;
+  sortBy: string;
   username: string;
   joinedDate: string;
 }
 
 const initialState: SettingsState = {
   selectedCategory: EMovieCategory.NOW_PLAYING,
+  sortBy: 'alphabetical',
   username: 'John Lee',
   joinedDate: 'August 2023',
 };
@@ -20,6 +22,9 @@ const settingsSlice = createSlice({
     setCategory: (state, action: PayloadAction<EMovieCategory>) => {
       state.selectedCategory = action.payload;
     },
+    setSortBy: (state, action: PayloadAction<string>) => {
+      state.sortBy = action.payload;
+    },
     setUsername: (state, action: PayloadAction<string>) => {
       state.username = action.payload;
     },
@@ -29,5 +34,5 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { setCategory, setUsername, setJoinedDate } = settingsSlice.actions;
+export const { setCategory, setSortBy, setUsername, setJoinedDate } = settingsSlice.actions;
 export default settingsSlice.reducer;

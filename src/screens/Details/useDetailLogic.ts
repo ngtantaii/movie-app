@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { movieApi } from '../../api/movies';
-import { IMovieDetail } from '../../api/types';
+import { IMovieDetail, IMovie } from '../../api/types';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   addToWatchlist,
@@ -19,7 +19,9 @@ export const useDetailLogic = () => {
   const { movieId } = route.params;
 
   const [movie, setMovie] = useState<IMovieDetail | null>(null);
+  const [recommendations, setRecommendations] = useState<IMovie[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
   // Get watchlist from Redux
   const watchlist = useAppSelector(state => state.watchlist.items);
@@ -27,6 +29,7 @@ export const useDetailLogic = () => {
 
   useEffect(() => {
     fetchDetail();
+    fetchRecommendations();
   }, [movieId]);
 
   const fetchDetail = async () => {
@@ -38,6 +41,18 @@ export const useDetailLogic = () => {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecommendations = async () => {
+    try {
+      setLoadingRecommendations(true);
+      const data = await movieApi.getMovieRecommendations(movieId);
+      setRecommendations(data.results.slice(0, 10));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingRecommendations(false);
     }
   };
 
@@ -53,7 +68,9 @@ export const useDetailLogic = () => {
 
   return {
     movie,
+    recommendations,
     loading,
+    loadingRecommendations,
     isFavorite,
     toggleWatchlist,
     goBack: navigation.goBack,

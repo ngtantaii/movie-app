@@ -1,97 +1,121 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Movie Database Application
 
-# Getting Started
+A React Native movie database application built with TypeScript, Redux Toolkit, and React Navigation.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Quick Start
 
-## Step 1: Start Metro
+1. Install dependencies: `npm install` or `yarn install`
+2. Create `.env` file in root:
+   ```
+   API_URL=your_api_base_url
+   API_KEY=your_api_read_access_token
+   IMAGE_BASE_URL=your_api_image_url
+   ```
+3. iOS: `cd ios && bundle exec pod install`
+4. Start Metro: `npm start`
+5. Run: `npm run ios` or `npm run android`
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Key Files Reference
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Configuration
+- `package.json` - Dependencies and scripts
+- `tsconfig.json` - TypeScript configuration
+- `.env` - Environment variables (NOT committed)
+- `.cursorrules` - Cursor AI assistant rules
+- `PROJECT_REQUIREMENTS.md` - Full project requirements
 
-```sh
-# Using npm
-npm start
+### Core Application
+- `App.tsx` - Root component with Redux Provider
+- `src/navigation/AppNavigator.tsx` - Navigation setup
+- `src/store/store.ts` - Redux store configuration
 
-# OR using Yarn
-yarn start
+### API Layer
+- `src/api/client.ts` - Axios instance with interceptors
+- `src/api/movies.ts` - Movie API functions
+- `src/api/types.ts` - TypeScript interfaces and enums
+
+### Screens
+- `src/screens/Home/` - Home screen with movie list
+- `src/screens/Details/` - Movie details screen
+- `src/screens/Watchlist/` - User watchlist screen
+
+### State Management
+- `src/store/slices/settingsSlice.ts` - Category, sort preferences
+- `src/store/slices/watchlistSlice.ts` - Watchlist state
+- `src/store/hooks.ts` - Typed Redux hooks
+
+## Common Tasks
+
+### Adding a New API Endpoint
+1. Add function to `src/api/movies.ts`
+2. Add TypeScript interface to `src/api/types.ts`
+3. Use in component or custom hook
+
+### Adding a New Screen
+1. Create folder in `src/screens/[ScreenName]/`
+2. Create `index.tsx` and `use[ScreenName]Logic.ts`
+3. Add route to `AppNavigator.tsx`
+
+### Adding a New Redux Slice
+1. Create slice in `src/store/slices/`
+2. Add to `rootReducer` in `store.ts`
+3. Add to `whitelist` in `persistConfig` if needs persistence
+
+### Adding a New Component
+1. Create in `src/components/`
+2. Export from `src/components/index.ts`
+3. Use TypeScript props interface
+
+## API Endpoints Used
+- `GET /movie/now_playing` - Now playing movies
+- `GET /movie/popular` - Popular movies
+- `GET /movie/upcoming` - Upcoming movies
+- `GET /movie/{id}` - Movie details
+- `GET /search/movie` - Search movies
+- `GET /movie/{id}/recommendations` - Recommended movies (optional)
+
+## Color Palette
+- Primary: `#01B4E4`
+- Tab Bar Background: `#032541`
+- Tab Active: `#01B4E4`
+- Tab Inactive: `#999`
+
+## Image URLs Pattern
+- Poster: `{image_base_url}/t/p/w500{poster_path}`
+- Backdrop: `{image_base_url}/t/p/w1280{backdrop_path}`
+- Profile: `{image_base_url}/t/p/w185{profile_path}`
+
+## Important Reminders
+- ✅ Never commit `.env` file or API keys
+- ✅ All comments/documentation in English
+- ✅ Use TypeScript for all new code
+- ✅ Follow existing code patterns
+- ✅ Handle error and loading states
+- ✅ Test on both iOS and Android
+- ✅ Persist settings and watchlist
+
+## Current Implementation Status
+See `PROJECT_REQUIREMENTS.md` for detailed status of completed and pending features.
+
+## Technology Stack
+- React Native 0.83.1
+- TypeScript
+- Redux Toolkit with Redux Persist
+- React Navigation (Native Stack + Bottom Tabs)
+- Axios for API calls
+- AsyncStorage for persistence
+- react-native-svg for custom icons
+
+## Project Structure
 ```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+src/
+├── api/              # API client and movie endpoints
+├── assets/           # Static assets
+├── components/       # Reusable UI components
+├── navigation/       # Navigation configuration
+├── screens/          # Screen components
+├── store/            # Redux store configuration
+├── theme/            # Theme configuration
+├── types/            # Global TypeScript types
+└── utils/            # Utility functions
 ```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.

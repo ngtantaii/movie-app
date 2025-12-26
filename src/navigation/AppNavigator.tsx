@@ -30,7 +30,7 @@ export const AppNavigator = () => {
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: '#01B4E4',
-          tabBarInactiveTintColor: '#999',
+          tabBarInactiveTintColor: '#FFFFFF',
           tabBarStyle: {
             backgroundColor: '#032541',
             borderTopWidth: 0,
@@ -53,7 +53,7 @@ export const AppNavigator = () => {
           component={WatchlistScreen}
           options={{
             tabBarLabel: '',
-            tabBarIcon: ({ color }) => <Icon name="Watchlist" color={color} size={24} />,
+            tabBarIcon: ({ color }) => <Icon name={"Watchlist"} color={color} size={24} />,
           }}
         />
       </Tab.Navigator>

@@ -1,18 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { setCategory } from '../../store/slices/settingsSlice';
+import { setCategory, setSortBy } from '../../store/slices/settingsSlice';
 import { movieApi } from '../../api/movies';
 import { IMovie, EMovieCategory } from '../../api/types';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, StackNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  Home: undefined;
+  Details: { movieId: number };
+};
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Home'
+>;
 
 export const useHomeLogic = () => {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const dispatch = useAppDispatch();
 
-  // Get selected category from Redux
+  // Get selected category and sortBy from Redux
   const selectedCategory = useAppSelector(
     state => state.settings.selectedCategory,
   );
+  const sortBy = useAppSelector(state => state.settings.sortBy);
 
   const [movies, setMovies] = useState<IMovie[]>([]);
   const [page, setPage] = useState(1);
@@ -67,7 +79,13 @@ export const useHomeLogic = () => {
   const handleCategoryChange = (cat: EMovieCategory) => {
     setIsSearching(false);
     setSearchQuery('');
-    dispatch(setCategory(cat)); // Lưu vào Redux
+    dispatch(setCategory(cat));
+  };
+
+  // Handler: Change Sort By
+  const handleSortByChange = (sortValue: string) => {
+    dispatch(setSortBy(sortValue));
+    // Sorting logic will be implemented when needed
   };
 
   // Handler: Search
@@ -93,9 +111,11 @@ export const useHomeLogic = () => {
     movies,
     loading,
     selectedCategory,
+    sortBy,
     searchQuery,
     setSearchQuery,
     handleCategoryChange,
+    handleSortByChange,
     handleSearch,
     handleLoadMore,
     navigateToDetail,

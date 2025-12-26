@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { IMovieResponse, IMovieDetail, EMovieCategory } from './types';
+import { IMovieResponse, IMovieDetail, EMovieCategory, IAccount } from './types';
 
 export const movieApi = {
   /**
@@ -39,9 +39,34 @@ export const movieApi = {
   getMovieDetail: async (id: number) => {
     const response = await apiClient.get<IMovieDetail>(`/movie/${id}`, {
       params: {
-        append_to_response: 'credits', // Get the actors all at once!
+        append_to_response: 'credits', // Get credits (cast and crew) in the same request
       },
     });
+    return response.data;
+  },
+
+  /**
+   * @description Get recommended movies for a specific movie
+   * @param id The ID of the movie
+   * @param page The page number for pagination
+   * @returns A promise that resolves to a MovieResponse object
+   */
+  getMovieRecommendations: async (id: number, page = 1) => {
+    const response = await apiClient.get<IMovieResponse>(
+      `/movie/${id}/recommendations`,
+      {
+        params: { page },
+      },
+    );
+    return response.data;
+  },
+
+  /**
+   * @description Get account details for the authenticated user
+   * @returns A promise that resolves to an Account object
+   */
+  getAccountDetails: async () => {
+    const response = await apiClient.get<IAccount>('/account/null');
     return response.data;
   },
 };
