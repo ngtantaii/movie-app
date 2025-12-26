@@ -73,3 +73,11 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Security
+.env
+
+# React Native
+ios/Pods/
+android/app/build/
+dist/
