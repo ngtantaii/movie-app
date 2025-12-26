@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { movieApi } from '../../api/movies';
 import { IMovieDetail, IMovie } from '../../api/types';
@@ -8,14 +8,15 @@ import {
   addToWatchlist,
   removeFromWatchlist,
 } from '../../store/slices/watchlistSlice';
+import { RootStackParamList } from '../../types/navigation';
+import { logger } from '../../utils/logger';
 
 type ParamList = {
-  Detail: { movieId: number };
+  Details: { movieId: number };
 };
 
 export const useDetailLogic = () => {
-  const route = useRoute<RouteProp<ParamList, 'Detail'>>();
-  const navigation = useNavigation();
+  const route = useRoute<RouteProp<RootStackParamList, 'Details'>>();
   const dispatch = useAppDispatch();
   const { movieId } = route.params;
 
@@ -39,7 +40,7 @@ export const useDetailLogic = () => {
       const data = await movieApi.getMovieDetail(movieId);
       setMovie(data);
     } catch (error) {
-      console.error(error);
+      logger.error('Failed to fetch movie details', error);
     } finally {
       setLoading(false);
     }
@@ -51,7 +52,7 @@ export const useDetailLogic = () => {
       const data = await movieApi.getMovieRecommendations(movieId);
       setRecommendations(data.results.slice(0, 10));
     } catch (error) {
-      console.error(error);
+      logger.error('Failed to fetch recommendations', error);
     } finally {
       setLoadingRecommendations(false);
     }
@@ -108,6 +109,5 @@ export const useDetailLogic = () => {
     loadingRecommendations,
     isFavorite,
     toggleWatchlist,
-    goBack: navigation.goBack,
   };
 };

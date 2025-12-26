@@ -11,6 +11,7 @@ import {
 import { Icon, AppLogo, MovieCard } from '../../components';
 import { useWatchlistLogic } from './useWatchlistLogic';
 import { IMovie } from '../../api/types';
+import { colors, spacing, typography, borderRadius, shadows } from '../../theme';
 
 export const WatchlistScreen = () => {
   const {
@@ -33,7 +34,7 @@ export const WatchlistScreen = () => {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handlePressOutside = (event: any) => {
+    const handlePressOutside = (event: { target: unknown }) => {
       if (
         isFilterOpen &&
         dropdownRef.current &&
@@ -64,7 +65,7 @@ export const WatchlistScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#032541" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark} />
 
       {/* Logo Header */}
       <View style={styles.logoHeader}>
@@ -101,7 +102,7 @@ export const WatchlistScreen = () => {
                 onPress={toggleFilterDropdown}
               >
                 <Text style={styles.dropdownText}>{selectedSort}</Text>
-                <Icon name="ChevronDown" size={14} color="#000" />
+                <Icon name="ChevronDown" size={14} color={colors.text.primary} />
               </TouchableOpacity>
 
               {isFilterOpen && (
@@ -142,7 +143,7 @@ export const WatchlistScreen = () => {
               <Icon
                 name={sortOrder === 'asc' ? 'ChevronUp' : 'ChevronDown'}
                 size={14}
-                color="#000"
+                        color={colors.text.primary}
               />
             </TouchableOpacity>
           </View>
@@ -168,67 +169,67 @@ export const WatchlistScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background.white,
   },
   logoHeader: {
-    padding: 16,
+    padding: spacing.lg,
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.background.white,
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
-    marginBottom: 12,
+    marginTop: spacing.xs,
+    marginBottom: spacing.md,
   },
   profileContainer: {
-    backgroundColor: '#032541',
-    gap: 16,
-    padding: 16,
+    backgroundColor: colors.primaryDark,
+    gap: spacing.lg,
+    padding: spacing.lg,
   },
   avatar: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#9C27B0',
+    backgroundColor: colors.purple,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   avatarText: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: 'bold',
+    color: colors.text.white,
+    fontSize: typography.fontSize.xxxl,
+    fontWeight: typography.fontWeight.bold,
   },
   profileInfo: {
     flex: 1,
   },
   profileName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 4,
+    fontSize: typography.fontSize.xl,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.text.white,
+    marginBottom: spacing.xs,
   },
   memberSince: {
-    fontSize: 14,
-    color: 'white',
+    fontSize: typography.fontSize.md,
+    color: colors.text.white,
   },
   filterSection: {
-    backgroundColor: 'white',
-    paddingTop: 20,
-    paddingBottom: 16,
+    backgroundColor: colors.background.white,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.lg,
   },
   watchlistTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
-    paddingHorizontal: 16,
-    marginBottom: 16,
+    fontSize: typography.fontSize.xxl,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.text.primary,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   filterBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.lg,
   },
   filterContainer: {
     flex: 1,
@@ -236,9 +237,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filterLabel: {
-    fontSize: 14,
-    color: '#999',
-    marginRight: 8,
+    fontSize: typography.fontSize.md,
+    color: colors.text.tertiary,
+    marginRight: spacing.sm,
   },
   dropdownContainer: {
     flex: 1,
@@ -248,16 +249,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: 'white',
-    borderRadius: 8,
+    padding: spacing.md,
+    backgroundColor: colors.background.white,
+    borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border.light,
     minHeight: 44,
   },
   dropdownText: {
-    fontSize: 14,
-    color: '#000',
+    fontSize: typography.fontSize.md,
+    color: colors.text.primary,
     flex: 1,
   },
   dropdown: {
@@ -265,55 +266,50 @@ const styles = StyleSheet.create({
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: colors.background.white,
+    borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    marginTop: 4,
+    borderColor: colors.border.light,
+    marginTop: spacing.xs,
     zIndex: 1000,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    ...shadows.large,
     overflow: 'hidden',
   },
   dropdownOption: {
-    padding: 12,
-    paddingVertical: 14,
+    padding: spacing.md,
+    paddingVertical: spacing.md + 2,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
+    borderBottomColor: colors.gray[100],
     minHeight: 44,
   },
   dropdownOptionSelected: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: colors.gray[200],
   },
   dropdownOptionText: {
-    fontSize: 14,
-    color: '#000',
-    fontWeight: '400',
+    fontSize: typography.fontSize.md,
+    color: colors.text.primary,
+    fontWeight: typography.fontWeight.normal,
   },
   dropdownOptionTextSelected: {
-    color: '#01B4E4',
-    fontWeight: '500',
+    color: colors.primary,
+    fontWeight: typography.fontWeight.medium,
     textDecorationLine: 'underline',
   },
   orderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 16,
+    marginLeft: spacing.lg,
   },
   orderLabel: {
-    fontSize: 14,
-    color: '#999',
-    marginRight: 8,
+    fontSize: typography.fontSize.md,
+    color: colors.text.tertiary,
+    marginRight: spacing.sm,
   },
   orderButton: {
-    padding: 4,
+    padding: spacing.xs,
   },
   listContent: {
-    // paddingHorizontal: 8,
-    paddingTop: 8,
+    paddingTop: spacing.sm,
   },
   emptyContainer: {
     flex: 1,
@@ -322,7 +318,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 16,
-    color: '#999',
+    fontSize: typography.fontSize.lg,
+    color: colors.text.tertiary,
   },
 });

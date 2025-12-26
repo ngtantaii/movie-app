@@ -1,16 +1,19 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { removeFromWatchlist } from '../../store/slices/watchlistSlice';
 import { setUsername, setJoinedDate } from '../../store/slices/settingsSlice';
 import { IMovie } from '../../api/types';
 import { movieApi } from '../../api/movies';
-import { format } from 'date-fns';
-
-type SortOption = 'Alphabetical order' | 'Rating' | 'Release date';
-type SortOrder = 'asc' | 'desc';
+import { formatDateLong } from '../../utils';
+import {
+  WatchlistSortOption,
+  SortOrder,
+  WATCHLIST_SORT_OPTIONS,
+} from '../../constants';
+import { WatchlistScreenNavigationProp } from '../../types/navigation';
+import { logger } from '../../utils/logger';
+import { useNavigation } from '@react-navigation/native';
 
 type RootStackParamList = {
   Home: undefined;
@@ -34,10 +37,10 @@ export const useWatchlistLogic = () => {
     state => state.settings.joinedDate || 'August 2023',
   );
   
-  const [selectedSort, setSelectedSort] = useState<SortOption>('Rating');
+  const [selectedSort, setSelectedSort] =
+    useState<WatchlistSortOption>('Rating');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const sortOptions: SortOption[] = ['Alphabetical order', 'Rating', 'Release date'];
 
   // Fetch account details on mount
   useEffect(() => {
@@ -50,7 +53,7 @@ export const useWatchlistLogic = () => {
         // Note: TMDB API doesn't provide joined date, so we'll keep the default
         // or you can use account.id to generate a date
       } catch (error) {
-        console.error('Failed to fetch account details:', error);
+        logger.error('Failed to fetch account details', error);
         // Keep default values on error
       }
     };
@@ -112,13 +115,13 @@ export const useWatchlistLogic = () => {
 
   const handleMoviePress = (movie: IMovie) => {
     // Navigate to Details screen in HomeTab stack
-    navigation.navigate('HomeTab' as any, {
+    navigation.navigate('HomeTab', {
       screen: 'Details',
       params: { movieId: movie.id },
-    } as any);
+    });
   };
 
-  const handleFilterSelect = (option: SortOption) => {
+  const handleFilterSelect = (option: WatchlistSortOption) => {
     setSelectedSort(option);
     setIsFilterOpen(false);
   };
@@ -140,7 +143,7 @@ export const useWatchlistLogic = () => {
     selectedSort,
     sortOrder,
     isFilterOpen,
-    sortOptions,
+    sortOptions: WATCHLIST_SORT_OPTIONS,
     username,
     joinedDate,
     handleRemove,

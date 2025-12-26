@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Icon } from './Icon';
 import { capitalizeWords } from '../utils';
+import { borderRadius, colors, shadows, spacing, typography } from '../theme';
 
 export interface IAccordionOption {
   label: string;
@@ -128,7 +129,7 @@ export const Accordion: React.FC<AccordionProps> = ({
         >
           <Text style={[styles.title, titleStyle]}>{getSelectedLabel()}</Text>
           <Animated.View style={iconAnimatedStyle}>
-            <Icon name="ChevronRight" size={16} color="#000" />
+            <Icon name="ChevronRight" size={16} color={colors.text.primary} />
           </Animated.View>
         </TouchableOpacity>
 
@@ -177,68 +178,64 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   accordionWrapper: {
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: colors.background.white,
+    borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border.light,
     overflow: 'hidden',
     position: 'relative',
     zIndex: 1,
   },
   expandedWrapper: {
-    borderColor: '#E0E0E0',
+    borderColor: colors.border.light,
     zIndex: 1000,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    ...shadows.large,
   },
   header: {
-    padding: 12,
-    backgroundColor: 'white',
+    padding: spacing.md,
+    backgroundColor: colors.background.white,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     minHeight: 44,
   },
   title: {
-    fontWeight: '400',
-    fontSize: 14,
-    color: '#000',
+    fontWeight: typography.fontWeight.normal,
+    fontSize: typography.fontSize.md,
+    color: colors.text.primary,
     flex: 1,
   },
   optionsContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-    borderRadius: 8,
+    borderTopColor: colors.border.light,
+    borderRadius: borderRadius.md,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
-    paddingHorizontal: 16,
-    gap: 8,
-    paddingVertical: 8,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
   },
   option: {
-    padding: 12,
-    paddingVertical: 14,
+    padding: spacing.md,
+    paddingVertical: spacing.md + 2,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
+    borderBottomColor: colors.gray[100],
     minHeight: 44,
-    backgroundColor: '#F8F8F8'
+    backgroundColor: colors.gray[50],
   },
   lastOption: {
     borderBottomWidth: 0,
   },
   selectedOption: {
-    backgroundColor: '#00B4E4',
+    backgroundColor: colors.primary,
   },
   optionText: {
-    fontSize: 14,
-    color: '#000',
-    fontWeight: '400',
+    fontSize: typography.fontSize.md,
+    color: colors.text.primary,
+    fontWeight: typography.fontWeight.normal,
   },
   selectedOptionText: {
-    color: 'white',
-    fontWeight: '500',
+    color: colors.text.white,
+    fontWeight: typography.fontWeight.medium,
   },
 });

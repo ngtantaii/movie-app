@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { format } from 'date-fns';
+import { formatDateLong } from '../utils';
 import { IMovie } from '../api/types';
 import { IMAGE_BASE_URL } from '@env';
 import { Icon } from './Icon';
+import { colors, spacing, typography, shadows, borderRadius } from '../theme';
 
 interface Props {
   movie: IMovie;
@@ -17,9 +18,7 @@ export const MovieCard: React.FC<Props> = ({ movie, onPress, onRemove }) => {
     : undefined;
 
   // Format date: "19 July 2023"
-  const formattedDate = movie.release_date
-    ? format(new Date(movie.release_date), 'd MMMM yyyy')
-    : movie.release_date;
+  const formattedDate = formatDateLong(movie.release_date);
 
   return (
     <TouchableOpacity style={styles.container} onPress={() => onPress(movie)}>
@@ -39,70 +38,25 @@ export const MovieCard: React.FC<Props> = ({ movie, onPress, onRemove }) => {
           onPress={() => onRemove(movie.id)}
           activeOpacity={0.7}
         >
-          <Icon name="Close" size={16} color="#000" />
+          <Icon name="Close" size={16} color={colors.text.primary} />
         </TouchableOpacity>
       )}
     </TouchableOpacity>
   );
 };
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flexDirection: 'row',
-//     backgroundColor: 'white',
-//     borderRadius: 8,
-//     marginVertical: 8,
-//     marginHorizontal: 16,
-//     elevation: 2,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 4,
-//     overflow: 'hidden',
-//     height: 150,
-//   },
-//   poster: {
-//     width: 100,
-//     height: '100%',
-//   },
-//   info: {
-//     flex: 1,
-//     padding: 12,
-//     justifyContent: 'center',
-//   },
-//   title: {
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//     color: '#000',
-//     marginBottom: 4,
-//   },
-//   date: {
-//     fontSize: 12,
-//     color: '#666',
-//     marginBottom: 8,
-//   },
-//   overview: {
-//     fontSize: 12,
-//     color: '#444',
-//   },
-// });
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: colors.background.white,
+    borderRadius: borderRadius.md,
+    marginVertical: spacing.sm,
+    marginHorizontal: spacing.lg,
+    ...shadows.medium,
     overflow: 'hidden',
     height: 140,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border.light,
     position: 'relative',
   },
   poster: {
@@ -111,30 +65,30 @@ const styles = StyleSheet.create({
   },
   info: {
     flex: 1,
-    padding: 12,
+    padding: spacing.md,
     paddingRight: 40,
   },
   title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 4,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   date: {
-    fontSize: 13,
-    color: '#999',
-    marginBottom: 8,
+    fontSize: typography.fontSize.sm,
+    color: colors.text.tertiary,
+    marginBottom: spacing.sm,
   },
   overview: {
-    fontSize: 13,
-    color: '#999',
-    lineHeight: 18,
+    fontSize: typography.fontSize.sm,
+    color: colors.text.tertiary,
+    lineHeight: typography.lineHeight.sm,
   },
   removeButton: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    padding: 4,
+    top: spacing.sm,
+    right: spacing.sm,
+    padding: spacing.xs,
     width: 24,
     height: 24,
     justifyContent: 'center',

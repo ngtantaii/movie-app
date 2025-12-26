@@ -7,6 +7,7 @@ import { DetailsScreen } from '../screens/Details';
 import { WatchlistScreen } from '../screens/Watchlist';
 import { Icon } from '../components';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, spacing } from '../theme';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
@@ -29,14 +30,14 @@ export const AppNavigator = () => {
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: '#01B4E4',
-          tabBarInactiveTintColor: '#FFFFFF',
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.white,
           tabBarStyle: {
-            backgroundColor: '#032541',
+            backgroundColor: colors.primaryDark,
             borderTopWidth: 0,
             height: 60,
-            paddingBottom: insets?.bottom ?? 8,
-            paddingTop: 8,
+            paddingBottom: insets?.bottom ?? spacing.sm,
+            paddingTop: spacing.sm,
           },
         }}
       >

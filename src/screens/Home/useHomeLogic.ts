@@ -5,27 +5,7 @@ import { movieApi } from '../../api/movies';
 import { IMovie, EMovieCategory } from '../../api/types';
 import { useNavigation, StackNavigationProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-type RootStackParamList = {
-  Home: undefined;
-  Details: { movieId: number };
-};
-
-type HomeScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Home'
->;
-
-// SortOption enum
-export enum SortOption {
-  ALPHABETICAL = 'alphabetical',
-  RATING = 'rating',
-  RELEASE_DATE = 'release_date',
-  DATE_DESC = 'Latest Release',
-  DATE_ASC = 'Oldest Release',
-  RATING_DESC = 'Highest Rated',
-  RATING_ASC = 'Lowest Rated',
-}
+import { SortOption } from '../../constants';
 
 export const useHomeLogic = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -76,7 +56,7 @@ export const useHomeLogic = () => {
           setPage(prev => prev + 1);
         }
       } catch (error) {
-        console.error('Fetch error:', error);
+        logger.error('Failed to fetch movies', error);
         // Reset on error
         if (reset) {
           setMovies([]);

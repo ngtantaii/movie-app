@@ -10,15 +10,15 @@ import {
   SafeAreaView,
   RefreshControl,
 } from 'react-native';
-import { useHomeLogic, SortOption } from './useHomeLogic';
+import { useHomeLogic } from './useHomeLogic';
 import {
   MovieCard,
   Accordion,
-  IAccordionOption,
   AppLogo,
 } from '../../components';
-import { EMovieCategory } from '../../api/types';
 import { capitalizeWords } from '../../utils';
+import { colors, spacing, typography, borderRadius, shadows } from '../../theme';
+import { CATEGORY_OPTIONS, SORT_BY_OPTIONS } from '../../constants';
 
 type ExpandedAccordion = 'category' | 'sortBy' | null;
 
@@ -52,21 +52,6 @@ export const HomeScreen = () => {
     setExpandedAccordion(prev => (prev === 'sortBy' ? null : 'sortBy'));
   };
 
-  // Category options
-  const categoryOptions: IAccordionOption[] = Object.values(EMovieCategory).map(
-    cat => ({
-      label: cat.replace('_', ' '),
-      value: cat,
-    }),
-  );
-
-  // Sort by options - keeping the original labels
-  const sortByOptions: IAccordionOption[] = [
-    { label: 'By Alphabetical Order', value: SortOption.ALPHABETICAL },
-    { label: 'By Rating', value: SortOption.RATING },
-    { label: 'By Release Date', value: SortOption.RELEASE_DATE },
-  ];
-
   // Handler for sort option change
   const handleSortByChange = (value: string) => {
     setSortOption(value as SortOption);
@@ -82,14 +67,11 @@ export const HomeScreen = () => {
         {/* Category Accordion */}
         <Accordion
           title="Category"
-          options={categoryOptions}
+          options={CATEGORY_OPTIONS}
           selectedValue={selectedCategory}
           onSelect={handleCategoryChange}
           isExpanded={expandedAccordion === 'category'}
           onToggle={handleCategoryToggle}
-          // renderSelectedLabel={value =>
-          //   capitalizeWords(value.replace('_', ' '))
-          // }
           isCapitalizeWords
           titleStyle={styles.selectedValueStyle}
         />
@@ -97,7 +79,7 @@ export const HomeScreen = () => {
         {/* Sort By Accordion */}
         <Accordion
           title="Sort by"
-          options={sortByOptions}
+          options={SORT_BY_OPTIONS}
           selectedValue={sortOption}
           onSelect={handleSortByChange}
           isExpanded={expandedAccordion === 'sortBy'}
@@ -151,7 +133,7 @@ export const HomeScreen = () => {
 
       {loading && movies.length === 0 ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#01B4E4" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Loading movies...</Text>
         </View>
       ) : (
@@ -165,8 +147,8 @@ export const HomeScreen = () => {
             <RefreshControl
               refreshing={loading && movies.length > 0}
               onRefresh={handleRefresh}
-              colors={['#01B4E4']}
-              tintColor="#01B4E4"
+              colors={[colors.primary]}
+              tintColor={colors.primary}
             />
           }
           ListEmptyComponent={
@@ -215,9 +197,13 @@ export const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white' },
-  header: { padding: 16, alignItems: 'center', backgroundColor: 'white' },
-  controls: { padding: 16 },
+  container: { flex: 1, backgroundColor: colors.background.white },
+  header: {
+    padding: spacing.lg,
+    alignItems: 'center',
+    backgroundColor: colors.background.white,
+  },
+  controls: { padding: spacing.lg },
 
   // Search Styles
   searchContainer: {
@@ -227,56 +213,59 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.background.white,
     borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 4,
-    elevation: 1,
+    borderColor: colors.border.medium,
+    borderRadius: borderRadius.sm,
+    ...shadows.small,
   },
   searchInput: {
     flex: 1,
-    padding: 12,
+    padding: spacing.md,
   },
   clearButton: {
-    padding: 8,
-    marginRight: 4,
+    padding: spacing.sm,
+    marginRight: spacing.xs,
   },
   clearButtonText: {
-    fontSize: 18,
-    color: '#999',
+    fontSize: typography.fontSize.xl,
+    color: colors.text.tertiary,
   },
   searchButton: {
-    padding: 12,
-    borderRadius: 20,
+    padding: spacing.md,
+    borderRadius: borderRadius.xl,
     alignItems: 'center',
     marginBottom: 10,
   },
   searchButtonEnabled: {
-    backgroundColor: '#01B4E4',
+    backgroundColor: colors.primary,
   },
   searchButtonDisabled: {
-    backgroundColor: '#ddd',
+    backgroundColor: colors.gray[500],
   },
   searchButtonText: {
-    fontWeight: '600',
+    fontWeight: typography.fontWeight.semibold,
   },
   searchButtonTextEnabled: {
-    color: 'white',
+    color: colors.text.white,
   },
   searchButtonTextDisabled: {
-    color: '#666',
+    color: colors.text.secondary,
   },
 
   // Footer
   loadMoreBtn: {
-    backgroundColor: '#01B4E4',
+    backgroundColor: colors.primary,
     padding: 15,
-    margin: 16,
-    borderRadius: 8,
+    margin: spacing.lg,
+    borderRadius: borderRadius.md,
     alignItems: 'center',
   },
-  loadMoreText: { color: 'white', fontWeight: 'bold' },
-  selectedValueStyle: { fontWeight: '600' },
+  loadMoreText: {
+    color: colors.text.white,
+    fontWeight: typography.fontWeight.bold,
+  },
+  selectedValueStyle: { fontWeight: typography.fontWeight.semibold },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -284,17 +273,17 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontSize: 16,
-    color: '#999',
+    fontSize: typography.fontSize.lg,
+    color: colors.text.tertiary,
     textAlign: 'center',
   },
   noMoreContainer: {
-    padding: 16,
+    padding: spacing.lg,
     alignItems: 'center',
   },
   noMoreText: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: typography.fontSize.md,
+    color: colors.text.tertiary,
   },
   loadingContainer: {
     flex: 1,
@@ -303,8 +292,8 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#999',
+    marginTop: spacing.md,
+    fontSize: typography.fontSize.lg,
+    color: colors.text.tertiary,
   },
 });
